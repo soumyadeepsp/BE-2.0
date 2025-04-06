@@ -1,0 +1,17 @@
+{
+  "name": "hms2.0",
+  "version": "1.0.0",
+  "description": "learning project in coding ninjas course",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Soumyadeep Paul",
+  "license": "ISC",
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "express": "^5.1.0",
+    "nodemon": "^3.1.9"
+  },
+  "type": "module"
+}
