@@ -1,11 +1,43 @@
 // server.js
 import express from 'express';
 import cookieParser from 'cookie-parser';
+import { rateLimit } from 'express-rate-limit';
+import helmet from 'helmet';
+
+const whitelist = ['::1'];
+//192.168.1.10
+const generalLimiter = rateLimit({
+	windowMs: 30 * 1000, // 15 minutes
+	limit: 5, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+  skip: (req, res) => {
+    console.log(req);
+    console.log("this is the request ip = "+req.ip);
+    return whitelist.includes(req.ip);
+  },
+	standardHeaders: 'draft-8', // draft-6: `RateLimit-*` headers; draft-7 & draft-8: combined `RateLimit` header
+  message: 'Too many requests, please try again later.',
+	legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
+	// store: ... , // Redis, Memcached, etc. See below.
+});
+
+const strictLimiter = rateLimit({
+	windowMs: 30 * 1000, // 15 minutes
+	limit: 3, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+	standardHeaders: 'draft-8', // draft-6: `RateLimit-*` headers; draft-7 & draft-8: combined `RateLimit` header
+  message: 'Too many requests, please try again later.',
+	legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
+	// store: ... , // Redis, Memcached, etc. See below.
+});
+
 const app = express();
 const port = 3000;
 
 app.use(cookieParser());
-
+app.use(express.static('./public'));
+app.use('/sample-get-request', strictLimiter); // Apply rate limiting to the specific route
+app.use(helmet.frameguard({ action: 'deny' })); // Prevent clickjacking
+app.use('/', generalLimiter); // Apply rate limiting to all requests
+app.set('view engine', 'ejs');
 // events-demo.js
 import EventEmitter from 'events';
 
@@ -24,7 +56,7 @@ app.get('/', (req, res) => {
     console.log(req.cookies);
     res.cookie('hello', 'new world');
     res.cookie('hello2', 'new world2');
-    res.send('Hello from Express!');
+    res.render('index');
 });
 
 app.get('/sample-get-request/:werfgrsbrtgf', (req, res) => {

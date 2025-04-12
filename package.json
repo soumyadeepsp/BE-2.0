@@ -10,7 +10,10 @@
   "license": "ISC",
   "dependencies": {
     "cookie-parser": "^1.4.7",
+    "ejs": "^3.1.10",
     "express": "^5.1.0",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.1.0",
     "nodemon": "^3.1.9"
   },
   "type": "module"

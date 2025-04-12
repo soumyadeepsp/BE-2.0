@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script>
+            function removeiframes() {
+                const iframes = document.querySelectorAll('iframe');
+                for (let i=0; i<iframes.length; i++) {
+                    iframes[i].remove();
+                }
+                console.log("hello world");
+            }
+        </script>
+    </head>
+    <body>
+        <iframe src="https://en.wikipedia.org/wiki/Donald_Trump" width="100%" height="100%"></iframe>
+         <input type="text" id="myInput"/>
+         <h1 style="display: none;"><script src="">console.log("hello world")</script></h1>
+         <script>
+            // Get the input element
+            var input = document.getElementById("myInput");
+
+            // Add an event listener for the "input" event
+            input.addEventListener("input", function() {
+                // Get the current value of the input
+                var value = input.value;
+                // Log the value to the console
+                console.log(value);
+                // Update the h1 element with the current value
+                document.querySelector("h1").innerText = value;
+            });
+         </script>
+    </body>
+</html>
