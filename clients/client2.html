@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+    <title>Document</title>
+    <script>
+        // const socket = io('http://localhost:3000');
+        const socket = window.socket;
+        const sendMessage = () => {
+            socket.emit('message', 'hello from client 2');
+            socket.on('response', (message) => {
+                alert(message);
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>this is the client 2</h1>
+    <button onclick="sendMessage()">send message</button>
+</body>
+</html>
