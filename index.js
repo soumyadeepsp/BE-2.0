@@ -4,6 +4,32 @@ import cookieParser from 'cookie-parser';
 import { rateLimit } from 'express-rate-limit';
 import helmet from 'helmet';
 import { body, validationResult } from 'express-validator';
+import fileUpload from 'express-fileupload';
+import fs from 'fs';
+import nodemailer from 'nodemailer';
+
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false, // true for port 465, false for other ports
+  auth: {
+    user: "soumyadeepsp@gmail.com",
+    pass: "gnmugxwnklynwlkv",
+  },
+});
+
+const sendEmail = async () => {
+  // send mail with defined transport object
+  const info = await transporter.sendMail({
+    from: '"Soumyadeep Paul 👻" <soumyadeepsp@gmail.com>', // sender address
+    to: "soumyadeep18104@iiitd.ac.in", // list of receivers
+    subject: "Hello ✔", // Subject line
+    // text: "localhost:3000/user/verify?token=abc", // plain text body
+    html: `<p>click <a href="http://localhost:3000/user/verify?token=abc">here</a> to verify</p>`, // html body
+  });
+  console.log("Message sent: %s", info.messageId);
+  // Message sent: <d786aa62-4e0a-070a-47ed-0b0666549519@ethereal.email>
+}
 
 const whitelist = ['::1'];
 //192.168.1.10
@@ -52,6 +78,10 @@ io.on('connection', (socket) => {
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.static('./public'));
+
+app.use(fileUpload({
+  limits: { fileSize: 50 * 1024 * 1024 },
+}));
 app.use('/sample-get-request', strictLimiter); // Apply rate limiting to the specific route
 app.use(helmet.frameguard({ action: 'deny' })); // Prevent clickjacking
 app.use('/', generalLimiter); // Apply rate limiting to all requests
@@ -76,6 +106,10 @@ app.get('/', (req, res) => {
     res.render('index');
 });
 
+app.get('/user/verify', (req, res) => {
+  return res.render('verify');
+});
+
 app.get('/sample-get-request/:werfgrsbrtgf', (req, res) => {
     const someData = req.params.werfgrsbrtgf;
     res.send(`You sent: ${someData}`);
@@ -86,6 +120,34 @@ app.get('/sample-get-request', (req, res) => {
     const k2 = req.query.k2;
     const k3 = req.query.k3;
     res.send(`hello world`);
+});
+
+app.post('/upload-file', (req, res) => {
+  console.log(req.files);
+  if (req.files) {
+    if (!fs.existsSync('./files')){
+      fs.mkdirSync('./files');
+    }
+    req.files.file.mv('./files/' + req.files.file.name, (err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send('Error occurred while uploading file');
+      }
+    });
+    return res.status(200).send('File uploaded successfully');
+  } else {
+    return res.status(400).send('No file uploaded');
+  }
+});
+
+app.get('/sendEmail', async (req, res) => {
+  try {
+    await sendEmail();
+    res.send('Email sent successfully');
+  } catch (error) {
+    console.error('Error sending email:', error);
+    res.status(500).send('Error sending email');
+  }
 });
 
 const removeSpecialCharacters = (str) => {
